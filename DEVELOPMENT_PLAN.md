@@ -1,6 +1,7 @@
-*GOAL*: Write a new, better dependency tool Single batch-script to execute.
+# GOAL
+Write a new, better dependency tool Single batch-script to execute.
 
-~~It should:~~
+# Task List
 - [x] ~~Ask which DMC to check dependencies for.~~ 
 - [x] ~~Ask if (and which) column to check dependencies for.~~  
 - [x] ~~Ask for checklist-selection (CLI) for which checks to carry out:~~
@@ -13,15 +14,16 @@
 - [x] ~~Print SQL statement for Step 2, and ask to execute in SSMS (specify environment). Wait for pressing Enter, then proceed.~~
 - [x] ~~Print SQL statement for Step 3, and ask to execute in SSMS (specify environment). Wait for pressing Enter, then proceed.~~ 
 - [x] ~~Ask for location to store temporary files (default: <somewhere>)~~
-- [ ] ~~Clone repos.~~ Bop bop: Koden er der med TAD/TKD har jokket fuldstædnig rundt i det. For lange filnavne og git kan ikke følge med.
-- [ ] Run checks from https://github.com/RegionHovedstaden/Utilities/blob/master/StudenterTeamet/screen_github.bat
+- [x] ~~Clone repos.~~ 
+  - *Bop bop*: Koden er der med TAD/TKD har jokket fuldstædnig rundt i det. For lange filnavne og git kan ikke følge med.
+- [ ] Run checks from [`screen_github.bat`](https://github.com/RegionHovedstaden/Utilities/blob/master/StudenterTeamet/screen_github.bat)
 - [ ] Delete temporary downloaded GitHub repos.
 
 
-
-- [ ] Confirm access to GitHub organization "Region Hovedstaden".
+### Nice-To-Haves
+- [ ] Confirm access to GitHub organization [`RegionHovedstaden`](https://github.com/RegionHovedstaden).
 - [ ] Fetch list of repos
-- [ ] Ask for checklist-selection (CLI) for which checks to carry out.Default:
+- [ ] Ask for checklist-selection (CLI) for which checks to carry out. Default:
   - Analytics
   - Clarity
   - Metrikker
