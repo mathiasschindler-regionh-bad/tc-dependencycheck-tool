@@ -23,6 +23,5 @@ if (-not [string]::IsNullOrWhiteSpace($ColumnName)) {
 
 # Path to the new script (assuming it's in a subfolder called Scripts)
 $scriptPath = ".\Scripts\Check-Dependencies.ps1"
-
-# Call the new script with the necessary parameters
 & $scriptPath -DMCName $DMCName -ColumnName $ColumnName
+
