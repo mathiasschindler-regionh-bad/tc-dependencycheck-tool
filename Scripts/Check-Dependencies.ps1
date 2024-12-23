@@ -10,7 +10,7 @@ $options = @("IDJ Dependencies", "SlicerDicer Dependencies", "Caboodle Dependenc
 $selectedItems = @()
 
 # Display options and allow user to select/deselect
-Write-Host "`nSelect checks to perform (Use spacebar to select/deselect, Enter to confirm):"
+Write-Host "`nSelect checks to perform:"
 $index = 0
 
 # Loop for each option to display and handle input
@@ -42,6 +42,10 @@ foreach ($selection in $selections) {
 if ($selectedItems.Count -gt 0) {
     Write-Host "`nYou selected the following checks:"
     $selectedItems | ForEach-Object { Write-Host $_ }
+    Write-Host "`n"
 } else {
     Write-Host "No checks selected."
 }
+
+# Return the selected items as the output of this script
+return $selectedItems
