@@ -1,3 +1,5 @@
+$scriptPath = ".\Scripts"
+
 # Clear console
 Clear-Host
 
@@ -22,6 +24,8 @@ if (-not [string]::IsNullOrWhiteSpace($ColumnName)) {
 }
 
 # Path to the new script (assuming it's in a subfolder called Scripts)
-$scriptPath = ".\Scripts\Check-Dependencies.ps1"
-& $scriptPath -DMCName $DMCName -ColumnName $ColumnName
+$selectedItems = & "$scriptPath\Check-Dependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName
 
+if ($selectedItems -contains "IDJ Dependencies") { & "$scriptPath\DependencyTypeChecks\IDJDependencies.ps1" -DMCName $DMCName }
+if ($selectedItems -contains "SlicerDicer Dependencies") { & "$scriptPath\DependencyTypeChecks\SlicerDicerDependencies.ps1" -DMCName $DMCName }
+if ($selectedItems -contains "Caboodle Dependencies") { & "$scriptPath\DependencyTypeChecks\CaboodleDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
