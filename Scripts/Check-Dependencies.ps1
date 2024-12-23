@@ -4,7 +4,7 @@ param (
 )
 
 # List of options
-$options = @("IDJ Dependencies", "SlicerDicer Dependencies", "Caboodle Dependencies", "GitHub Dependencies")
+$options = @("IDJ Dependencies", "SlicerDicer Dependencies", "Caboodle Dependencies", "Git Dependencies")
 
 # Initialize selected items array
 $selectedItems = @()
