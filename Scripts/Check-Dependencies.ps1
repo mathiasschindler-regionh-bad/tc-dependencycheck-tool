@@ -24,6 +24,7 @@ foreach ($option in $options) {
 
 # Prompt user to select options
 Write-Host "`nEnter the numbers (comma-separated) of the options you want to select, then press Enter:"
+Write-Host "`n(Leave empty to select all)"
 
 # Capture user input
 $userInput = Read-Host -Prompt "Selection"
@@ -36,6 +37,11 @@ foreach ($selection in $selections) {
     } else {
         Write-Host "Invalid selection: $selection"
     }
+}
+
+# If no selections were made, select all options by default
+if ($selectedItems.Count -eq 0) {
+    $selectedItems = $options
 }
 
 # Summarizing selections
