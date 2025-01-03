@@ -27,7 +27,7 @@ Write-Host "     SELECT ProcedureDataDependencies_AllLocales.SourceTableName,
                     ProcedureDataSources_AllLocales.ColumnName 
                 FROM config.ProcedureDataSources_AllLocales 
                 WHERE ProcedureDataSources_AllLocales.SourceTableName = '$DMCName'
-                --AND ProcedureDataSources_AllLocales.SourceColumnName = '$ColumnName'"
+                --AND ProcedureDataSources_AllLocales.SourceColumnName = '$ColumnName'" -ForegroundColor Yellow 
 
 Write-Host "`nDependency-free criteria: If no text is printed"
 Write-Host "(Press 'Enter' to proceed)"
@@ -50,7 +50,7 @@ Write-Host "     SELECT PackageDataSources_AllLocales.SourceTableName,
                     PackageDataDependencies_AllLocales.ColumnName 
                 FROM Config.PackageDataDependencies_AllLocales 
                 WHERE PackageDataDependencies_AllLocales.SourceTableName = '$DMCName'
-                --AND PackageDataDependencies_AllLocales.SourceColumnName = '$ColumnName'"
+                --AND PackageDataDependencies_AllLocales.SourceColumnName = '$ColumnName'" -ForegroundColor Yellow 
 
 Write-Host "`nDependency-free criteria: If no text is printed"
 Write-Host "(Press 'Enter' to proceed)"
