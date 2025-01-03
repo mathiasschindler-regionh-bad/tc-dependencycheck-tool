@@ -36,7 +36,7 @@ $selectedItems = & "$initialDirectory\Scripts\Check-Dependencies.ps1" -DMCName $
         if (-not [string]::IsNullOrWhiteSpace($gitClonePath)) {
             $gitClonePath = $gitClonePath.Trim()
         } else {
-            $gitClonePath = ".\TEMP-git-clone"
+            $gitClonePath = "$initialDirectory\TEMP-git-clone"
         }
 
         # Ensure the directory exists
@@ -52,6 +52,7 @@ if ($selectedItems -contains "SlicerDicer Dependencies") { & "$initialDirectory\
 if ($selectedItems -contains "Caboodle Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\CaboodleDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
 
 if ($selectedItems -contains "Git Dependencies") {
+    # Initialize remote git addresses
     $repos = @(
         "git@github.com:RegionHovedstaden/Analytics.git",
         "git@github.com:RegionHovedstaden/Clarity.git",
@@ -61,19 +62,30 @@ if ($selectedItems -contains "Git Dependencies") {
         "git@github.com:RegionHovedstaden/SP-Power-BI-Development.git"
     )
 
+    # Check the current configuration of core.longpaths to allow very long filenames if necessary
+    $coreLongPaths = git config --global core.longpaths
+    if ($coreLongPaths -ne "true") {
+        Write-Host "`ncore.longpaths is not set to true. Attempting to set it to true (in order to allow extraordinarily long file names)..."
+        try {
+            # Set core.longpaths to true
+            git config --global core.longpaths true
+            Write-Host "Successfully set core.longpaths to true."
+        } catch {
+            Write-Host "Failed to set core.longpaths to true. Error: $_"
+            Write-Host "Proceding without setting parameter to appropriate value ..."
+        }
+    }
+
     # Clone the repositories
-    cd $gitClonePath
+    Set-Location $gitClonePath
     foreach ($repo in $repos) {
         git clone $repo
     }
 
-    # Loop through each repository folder to perform git operations
-    foreach ($repo in $repos) {
-        # Extract the repository name from the URL for folder navigation
-        $repoName = $repo -split '/' | Select-Object -Last 1 | ForEach-Object { $_ -replace ".git", "" }
-
-        # Change to the repository directory
-        cd ".\$repoName"
+    # Loop through each repository folder to set default branches and pull latest changes 
+    $clonedRepos = Get-ChildItem -Path $gitClonePath -Directory # gets the list of directories from the clone path
+    foreach ($repo in $clonedRepos) {
+        Set-Location $repo
 
         # Find the default branch, pull changes, and print the status
         $defaultBranch = git symbolic-ref refs/remotes/origin/HEAD --short
@@ -82,12 +94,10 @@ if ($selectedItems -contains "Git Dependencies") {
         git checkout $branch
         Write-Host "Pulling latest changes in branch $branch for $repoName ..."
         git pull
-        # Write-Host "Current branch for $repoName: $(git rev-parse --abbrev-ref HEAD)"
-        # git status
 
-        cd ..
+        Set-Location $gitClonePath
     }
 
     # Return to the initial script directory
-    cd $initialDirectory
+    Set-Location $initialDirectory
 }
