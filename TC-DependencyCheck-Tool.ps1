@@ -52,6 +52,8 @@ if ($selectedItems -contains "SlicerDicer Dependencies") { & "$initialDirectory\
 if ($selectedItems -contains "Caboodle Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\CaboodleDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
 
 if ($selectedItems -contains "Git Dependencies") {
+    Write-Host "Running Git operations ... (might take some minutes)`n`n"
+
     # Initialize remote git addresses
     $repos = @(
         "git@github.com:RegionHovedstaden/Analytics.git",
@@ -65,14 +67,14 @@ if ($selectedItems -contains "Git Dependencies") {
     # Check the current configuration of core.longpaths to allow very long filenames if necessary
     $coreLongPaths = git config --global core.longpaths
     if ($coreLongPaths -ne "true") {
-        Write-Host "`ncore.longpaths is not set to true. Attempting to set it to true (in order to allow extraordinarily long file names)..."
+        Write-Host "`ncore.longpaths is not set to true. Attempting to set it to true (in order to allow extraordinarily long file names)..." -ForegroundColor DarkGray
         try {
             # Set core.longpaths to true
             git config --global core.longpaths true
-            Write-Host "Successfully set core.longpaths to true."
+            Write-Host "Successfully set core.longpaths to true." -ForegroundColor DarkGray
         } catch {
-            Write-Host "Failed to set core.longpaths to true. Error: $_"
-            Write-Host "Proceding without setting parameter to appropriate value ..."
+            Write-Host "Failed to set core.longpaths to true. Error: $_" -ForegroundColor DarkGray
+            Write-Host "Proceding without setting parameter to appropriate value ..." -ForegroundColor DarkGray
         }
     }
 
@@ -90,14 +92,46 @@ if ($selectedItems -contains "Git Dependencies") {
         # Find the default branch, pull changes, and print the status
         $defaultBranch = git symbolic-ref refs/remotes/origin/HEAD --short
         $branch = $defaultBranch -split '/' | Select-Object -Last 1
-        Write-Host "Checking out branch $branch for $repoName ..."
+        Write-Host "Checking out branch $branch for $repoName ..." -ForegroundColor DarkGray
         git checkout $branch
-        Write-Host "Pulling latest changes in branch $branch for $repoName ..."
+        Write-Host "Pulling latest changes in branch $branch for $repoName ..." -ForegroundColor DarkGray
         git pull
 
         Set-Location $gitClonePath
     }
 
+    # Search for the column if specified, otherwise the DMC name
+    $searchString = if (-not [string]::IsNullOrWhiteSpace($ColumnName)) { $ColumnName } else { $DMCName }
+    # Create a output file
+    $outputFilePath = "$initialDirectory\output.md"
+    Set-Content -Path $outputFilePath -Value "# Dependency Search Results for $DMCName.$ColumnName`n"
+    
+    # Loop through each repository and run `git grep` with the search string
+    Write-Host "`n`nRunning git grep for '$searchString' in repositories..."
+    foreach ($repo in $clonedRepos) {
+        Set-Location $repo
+        Write-Host "`nRunning git grep for '$searchString' in $repo"
+        
+        
+        # Search through repo for search term; Append to markdown output file
+        $grepResults = git grep $searchString
+        Add-Content -Path $outputFilePath -Value "## Repository: $repo`n"
+        if (-not [string]::IsNullOrWhiteSpace($grepResults)) {
+            Write-Host "`n$grepResults" -ForegroundColor Yellow
+            Add-Content -Path $outputFilePath -Value $grepResults 
+        } else {
+            Write-Host "No matches found.`n" -ForegroundColor DarkGray
+            Add-Content -Path $outputFilePath -Value "No matches found.`n" 
+        }
+
+        Set-Location $gitClonePath
+    } 
+    Write-Host "`nSearch results saved to $outputFilePath" -ForegroundColor Black -BackgroundColor Yellow 
+
     # Return to the initial script directory
     Set-Location $initialDirectory
 }
+
+Write-Host "`n`nClosing program ..."
+Start-Sleep -Seconds 2
+Write-Host "Goodbye (ʘ‿ʘ)╯"
