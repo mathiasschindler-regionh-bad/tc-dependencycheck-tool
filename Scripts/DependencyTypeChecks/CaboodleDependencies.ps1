@@ -8,7 +8,7 @@ Write-Host "Follow the steps:"
 Write-Host "  1. Open the VDI"
 Write-Host "  2. Open SQL Server Management Studio"
 Write-Host "  3. Connect to the DEV Server"
-Write-Host "  4. Run the query on the staging database to check for dependencies in *procedure data lineage*:`n"
+Write-Host "  4. Run the query on the staging database to check for dependencies in *procedure data lineage* (available in all environments):`n"
 Write-Host "     SELECT ProcedureDataDependencies_AllLocales.SourceTableName, 
                     ProcedureDataDependencies_AllLocales.SourceColumnName, 
                     ProcedureDataDependencies_AllLocales.TableEtlName, 
@@ -33,7 +33,7 @@ Write-Host "`nDependency-free criteria: If no text is printed"
 Write-Host "(Press 'Enter' to proceed)"
 Read-Host
 
-Write-Host "  5. Run the query on the staging database to check for dependencies in *package data lineage*:`n"
+Write-Host "  5. Run the query on the staging database to check for dependencies in *package data lineage* (available in all environments):`n"
 Write-Host "     SELECT PackageDataSources_AllLocales.SourceTableName, 
                     PackageDataSources_AllLocales.SourceColumnName, 
                     PackageDataSources_AllLocales.TableEtlName, 
