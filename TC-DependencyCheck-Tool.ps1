@@ -48,7 +48,7 @@ $selectedItems = & "$initialDirectory\Scripts\Check-Dependencies.ps1" -DMCName $
 }
 
 if ($selectedItems -contains "IDJ Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\IDJDependencies.ps1" -DMCName $DMCName }
-if ($selectedItems -contains "SlicerDicer Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\SlicerDicerDependencies.ps1" -DMCName $DMCName }
+if ($selectedItems -contains "SlicerDicer Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\SlicerDicerDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
 if ($selectedItems -contains "Caboodle Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\CaboodleDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
 
 if ($selectedItems -contains "Git Dependencies") {
@@ -61,7 +61,7 @@ if ($selectedItems -contains "Git Dependencies") {
         "git@github.com:RegionHovedstaden/Metrikker.git",
         "git@github.com:RegionHovedstaden/Reports.git",
         "git@github.com:RegionHovedstaden/Research.git",
-        "git@github.com:RegionHovedstaden/SP-Power-BI-Development.git"
+        "git@github.com:RegionH/DAP-PowerBI-COK-Dataenheden.git"
     )
 
     # Check the current configuration of core.longpaths to allow very long filenames if necessary
