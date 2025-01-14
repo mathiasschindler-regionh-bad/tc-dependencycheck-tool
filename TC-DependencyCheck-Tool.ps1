@@ -1,6 +1,12 @@
-# Save the current directory path at the start
+# Initialize configurations
 $initialDirectory = Get-Location
-# $scriptPath = ".\Scripts"
+$repos = @(
+    "git@github.com:RegionH/DAP-SP-Analytics.git",
+    "git@github.com:RegionH/DAP-SP-Clarity.git",
+    "git@github.com:RegionHovedstaden/Reports.git",
+    "git@github.com:RegionH/DAP-SP-Research.git",
+    "git@github.com:RegionH/DAP-PowerBI-COK-Dataenheden.git"
+)
 
 # Clear console
 Clear-Host
@@ -54,15 +60,6 @@ if ($selectedItems -contains "Caboodle Dependencies") { & "$initialDirectory\Scr
 if ($selectedItems -contains "Git Dependencies") {
     Write-Host "Running Git operations ... (might take some minutes)`n`n"
 
-    # Initialize remote git addresses
-    $repos = @(
-        "git@github.com:RegionHovedstaden/Analytics.git",
-        "git@github.com:RegionHovedstaden/Clarity.git",
-        "git@github.com:RegionHovedstaden/Metrikker.git",
-        "git@github.com:RegionHovedstaden/Reports.git",
-        "git@github.com:RegionHovedstaden/Research.git",
-        "git@github.com:RegionH/DAP-PowerBI-COK-Dataenheden.git"
-    )
 
     # Check the current configuration of core.longpaths to allow very long filenames if necessary
     $coreLongPaths = git config --global core.longpaths
