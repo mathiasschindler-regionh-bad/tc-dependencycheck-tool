@@ -1,12 +1,13 @@
 # Initialize configurations
 $initialDirectory = Get-Location
 $repos = @(
-    "git@github.com:RegionH/DAP-SP-Analytics.git",
-    "git@github.com:RegionH/DAP-SP-Clarity.git",
-    "git@github.com:RegionHovedstaden/Reports.git",
-    "git@github.com:RegionH/DAP-SP-Research.git",
-    "git@github.com:RegionH/DAP-PowerBI-COK-Dataenheden.git"
+    "https://github.com/RegionH/DAP-SP-Analytics.git",
+    "https://github.com/RegionH/DAP-SP-Clarity.git",
+    "https://github.com/RegionHovedstaden/Reports.git",
+    "https://github.com/RegionH/DAP-SP-Research.git",
+    "https://github.com/RegionH/DAP-PowerBI-COK-Dataenheden.git"
 )
+
 
 # Clear console
 Clear-Host
@@ -35,28 +36,66 @@ if (-not [string]::IsNullOrWhiteSpace($ColumnName)) {
 $selectedItems = & "$initialDirectory\Scripts\Check-Dependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName
     if ($selectedItems -contains "Git Dependencies") {
         if ($selectedItems -contains "Git Dependencies") {
-        # Prompt user for the path to store temporary Git clones
-        $gitClonePath = Read-Host -Prompt "Select path to store temporary git clones (default: .\TEMP-git-clone)"
+        
+            # Checking that Git is installed and available on PATH
+            Write-Host "`nChecking Git installation and availability: $repo" 
+            try {
+                # Use git ls-remote to test authorization
+                git --version $repo > $null 2>&1
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host ([char]0x2714) "Git is installed and available in PATH variable." -ForegroundColor DarkGreen
+                } else {
+                    Write-Host ([char]0x2757) "ERROR: Git is not installed or not available in PATH variable" -ForegroundColor Red
+                    throw "  You need to install Git or make it available on PATH. Refer to this project's README.md-file for further instructions."
+                }
+            } catch {
+                Write-Host ([char]0x2757) "ERROR: Git is not installed or not available in PATH variable" -ForegroundColor Red
+                throw "  You need to install Git or make it available on PATH. Refer to this project's README.md-file for further instructions."                    
+            }
 
-        # If the user didn't provide a path, use the default
-        if (-not [string]::IsNullOrWhiteSpace($gitClonePath)) {
-            $gitClonePath = $gitClonePath.Trim()
-        } else {
-            $gitClonePath = "$initialDirectory\TEMP-git-clone"
-        }
+            #Checking if SSH access keys are setup
+            Write-Host "`nChecking Git authorization for repository: $repo" 
+            foreach ($repo in $repos) {
+                try {
+                    # Use git ls-remote to test authorization
+                    git ls-remote $repo > $null 2>&1
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-Host ([char]0x2714) "Authorization accepted for $repo." -ForegroundColor DarkGreen
+                    } else {
+                        Write-Host ([char]0x2757) "Authorization failed for $repo" -ForegroundColor Red
+                        throw "Authorization failed for repository: $repo. Terminating script."
+                    }
+                } catch {
+                    Write-Host ([char]0x2757) "An error occurred while checking authorization for $repo" -ForegroundColor Red
+                    throw "An error occurred while checking authorization for $repo. Terminating script."                    
+                }
+            }
 
-        # Ensure the directory exists
-        if (-not (Test-Path $gitClonePath)) {
-            Write-Host "Creating directory $gitClonePath"
-            New-Item -ItemType Directory -Path $gitClonePath
+            # Prompt user for the path to store temporary Git clones
+            $gitClonePath = Read-Host -Prompt "Select path to store temporary git clones (default: .\TEMP-git-clone)"
+
+            # If the user didn't provide a path, use the default
+            if (-not [string]::IsNullOrWhiteSpace($gitClonePath)) {
+                $gitClonePath = $gitClonePath.Trim()
+            } else {
+                $gitClonePath = "$initialDirectory\TEMP-git-clone"
+            }
+
+            # Ensure the directory exists
+            if (-not (Test-Path $gitClonePath)) {
+                Write-Host "Creating directory $gitClonePath"
+                New-Item -ItemType Directory -Path $gitClonePath
+            }
+
+            # Clear Console and begin checks
+            Start-Sleep -Seconds 1
+            Clear-Host
         }
     }
-}
 
 if ($selectedItems -contains "IDJ Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\IDJDependencies.ps1" -DMCName $DMCName }
 if ($selectedItems -contains "SlicerDicer Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\SlicerDicerDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
 if ($selectedItems -contains "Caboodle Dependencies") { & "$initialDirectory\Scripts\DependencyTypeChecks\CaboodleDependencies.ps1" -DMCName $DMCName -ColumnName $ColumnName }
-
 if ($selectedItems -contains "Git Dependencies") {
     Write-Host "Running Git operations ... (might take some minutes)`n`n"
 
@@ -89,9 +128,9 @@ if ($selectedItems -contains "Git Dependencies") {
         # Find the default branch, pull changes, and print the status
         $defaultBranch = git symbolic-ref refs/remotes/origin/HEAD --short
         $branch = $defaultBranch -split '/' | Select-Object -Last 1
-        Write-Host "Checking out branch $branch for $repoName ..." -ForegroundColor DarkGray
+        Write-Host "${repo}: Checking out branch $branch ..." -ForegroundColor DarkGray
         git checkout $branch
-        Write-Host "Pulling latest changes in branch $branch for $repoName ..." -ForegroundColor DarkGray
+        Write-Host "${repo}: Pulling latest changes in branch $branch ..." -ForegroundColor DarkGray
         git pull
 
         Set-Location $gitClonePath
@@ -123,6 +162,18 @@ if ($selectedItems -contains "Git Dependencies") {
 
         Set-Location $gitClonePath
     } 
+
+    # Cleanup: Delete the temp folder with Git repo clones
+    Write-Host "`nCleaning up temporary Git clone folder: $gitClonePath"
+    try {
+        Set-Location $initialDirectory
+        Remove-Item -Path $gitClonePath -Recurse -Force
+        Write-Host "  Temporary folder deleted successfully." -ForegroundColor DarkGray
+    } catch {
+        Write-Host "  An error occurred while deleting the temporary folder: $_" -ForegroundColor DarkGray
+    }
+
+    # Show final message with search results
     Write-Host "`nSearch results saved to $outputFilePath" -ForegroundColor Black -BackgroundColor Yellow 
 
     # Return to the initial script directory
